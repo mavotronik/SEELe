@@ -29,6 +29,43 @@ func TestManagerStubDigitalOut(t *testing.T) {
 	}
 }
 
+func TestManagerInvertDigitalOut(t *testing.T) {
+	dir := t.TempDir()
+	store, err := NewStore(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := NewManager(store, true)
+
+	on := PinConfig{Mode: ModeOut, Output: OutputDigital, Value: true, Invert: true}
+	if err := m.SetConfig("4", on); err != nil {
+		t.Fatal(err)
+	}
+	if lvl := pinLevel(t, m, "4"); lvl == nil || *lvl {
+		t.Fatalf("invert on: expected LOW, got %v", lvl)
+	}
+
+	off := PinConfig{Mode: ModeOut, Output: OutputDigital, Value: false, Invert: true}
+	if err := m.SetConfig("4", off); err != nil {
+		t.Fatal(err)
+	}
+	if lvl := pinLevel(t, m, "4"); lvl == nil || !*lvl {
+		t.Fatalf("invert off: expected HIGH, got %v", lvl)
+	}
+}
+
+func pinLevel(t *testing.T, m *Manager, id string) *bool {
+	t.Helper()
+	for i := range m.Snapshot().Pins {
+		p := m.Snapshot().Pins[i]
+		if p.ID == id {
+			return p.Level
+		}
+	}
+	t.Fatalf("pin %s not found", id)
+	return nil
+}
+
 func TestManagerDefaultSaveReset(t *testing.T) {
 	dir := t.TempDir()
 	store, err := NewStore(dir)

@@ -966,6 +966,70 @@ canvas {
     color: var(--danger);
 }
 
+.gpio-pinout {
+    position: relative;
+
+    width: min(1107px, 100%);
+    margin: 0 auto;
+}
+
+.gpio-pinout img {
+    display: block;
+
+    width: 100%;
+    height: auto;
+
+    user-select: none;
+}
+
+.gpio-pin {
+    position: absolute;
+
+    z-index: 1;
+
+    padding: 0;
+
+    border: 0;
+    border-radius: 5px;
+
+    background: transparent;
+
+    cursor: pointer;
+}
+
+.gpio-pin:hover,
+.gpio-pin:focus-visible {
+    background: color-mix(in srgb, var(--primary) 32%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 75%, transparent);
+    outline: none;
+}
+
+.gpio-pin.is-configured {
+    background: color-mix(in srgb, var(--primary) 58%, transparent);
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+.gpio-pin.is-uart,
+.gpio-pin.is-uart:hover,
+.gpio-pin.is-uart:focus-visible {
+    outline: 2px solid var(--danger);
+    outline-offset: 1px;
+}
+
+.gpio-pin.is-uart:hover,
+.gpio-pin.is-uart:focus-visible,
+.gpio-pin.is-uart.is-configured {
+    box-shadow: none;
+}
+
+.gpio-pin-dialog {
+    max-width: 460px;
+}
+
+.gpio-pin-dialog .modal-body {
+    color: var(--text);
+}
+
 /* =====================================================
    TOAST
 ===================================================== */

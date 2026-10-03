@@ -91,7 +91,7 @@ func (m *Manager) Snapshot() Snapshot {
 				pr.Level = &v
 			}
 		} else if ps.configured && cfg.Mode == ModeOut && cfg.Output == OutputDigital {
-			v := cfg.Value
+			v := cfg.ElectricalLevel()
 			pr.Level = &v
 		}
 		out.Pins = append(out.Pins, pr)
@@ -240,7 +240,7 @@ func (m *Manager) applyLocked(id string, cfg PinConfig, source string) (err erro
 			msg += fmt.Sprintf(", pwm=%s", ps.pwmBackend)
 		}
 		if cfg.Mode == ModeOut && cfg.Output == OutputDigital {
-			msg += fmt.Sprintf(", level=%t", cfg.Value)
+			msg += fmt.Sprintf(", level=%t", cfg.ElectricalLevel())
 		}
 		log.Print(msg)
 	}()
@@ -301,13 +301,14 @@ func (m *Manager) applyLocked(id string, cfg PinConfig, source string) (err erro
 	// digital out
 	// GPIO2 is not registered on this kernel (no ff540000.gpio). linux GPIO 72
 	// would be aimed at a different gpiochip. Drive the bank registers directly.
+	level := cfg.ElectricalLevel()
 	if m.backend.Hardware() && def.Bank == 2 && !gpioBankProbed(2) {
-		detail, match, ferr := forceGPIOLevel(def, cfg.Value)
+		detail, match, ferr := forceGPIOLevel(def, level)
 		if ferr != nil && !errors.Is(ferr, errMMIOBlind) {
 			return fmt.Errorf("регистры GPIO/IOMUX: %w", ferr)
 		}
 		if !match {
-			return fmt.Errorf("площадка не приняла уровень %t (%s)", cfg.Value, detail)
+			return fmt.Errorf("площадка не приняла уровень %t (%s)", level, detail)
 		}
 		m.runtime[id] = ps
 		return nil
@@ -318,23 +319,23 @@ func (m *Manager) applyLocked(id string, cfg PinConfig, source string) (err erro
 	if err := m.backend.SetDirection(linuxGPIO, ModeOut); err != nil {
 		return err
 	}
-	if err := m.backend.Write(linuxGPIO, cfg.Value); err != nil {
+	if err := m.backend.Write(linuxGPIO, level); err != nil {
 		return err
 	}
 	if m.backend.Hardware() {
-		detail, match, ferr := forceGPIOLevel(def, cfg.Value)
+		detail, match, ferr := forceGPIOLevel(def, level)
 		if errors.Is(ferr, errMMIOBlind) {
-			if werr := m.backend.Write(linuxGPIO, cfg.Value); werr != nil {
+			if werr := m.backend.Write(linuxGPIO, level); werr != nil {
 				return werr
 			}
 			rb, rerr := m.backend.ReadLevel(linuxGPIO)
-			if rerr != nil || rb != cfg.Value {
-				return fmt.Errorf("уровень %t не подтверждён gpio-cdev (read=%v err=%v); %s", cfg.Value, rb, rerr, detail)
+			if rerr != nil || rb != level {
+				return fmt.Errorf("уровень %t не подтверждён gpio-cdev (read=%v err=%v); %s", level, rb, rerr, detail)
 			}
 		} else if ferr != nil {
 			return fmt.Errorf("регистры GPIO/IOMUX: %w", ferr)
 		} else if !match {
-			return fmt.Errorf("площадка не приняла уровень %t (%s)", cfg.Value, detail)
+			return fmt.Errorf("площадка не приняла уровень %t (%s)", level, detail)
 		}
 	}
 	m.runtime[id] = ps
@@ -395,7 +396,10 @@ func describeConfig(cfg PinConfig) string {
 		if cfg.Output == OutputPWM {
 			return fmt.Sprintf("output pwm %.0f Hz, duty %.0f%%", cfg.FrequencyHz, cfg.DutyPercent)
 		}
-		return fmt.Sprintf("output digital, level=%t", cfg.Value)
+		if cfg.Invert {
+			return fmt.Sprintf("output digital, level=%t, inverted", cfg.ElectricalLevel())
+		}
+		return fmt.Sprintf("output digital, level=%t", cfg.ElectricalLevel())
 	default:
 		return "unknown"
 	}

@@ -31,8 +31,18 @@ type PinConfig struct {
 	Mode         Mode       `json:"mode"`
 	Output       OutputKind `json:"output,omitempty"`
 	Value        bool       `json:"value,omitempty"`
+	Invert       bool       `json:"invert,omitempty"`
 	FrequencyHz  float64    `json:"frequencyHz,omitempty"`
 	DutyPercent  float64    `json:"dutyPercent,omitempty"`
+}
+
+// ElectricalLevel is the pad level for a digital output.
+// With Invert, the switch is active-low: on drives LOW, off drives HIGH.
+func (c PinConfig) ElectricalLevel() bool {
+	if c.Invert {
+		return !c.Value
+	}
+	return c.Value
 }
 
 // PinRuntime is catalog + live state returned by the API.
