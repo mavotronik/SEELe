@@ -1,4 +1,4 @@
-module armada
+module seele
 
 go 1.22
 

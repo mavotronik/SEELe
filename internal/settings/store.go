@@ -15,7 +15,7 @@ const (
 	KeySystemName  = "system_name"
 	KeyAutoRefresh = "auto_refresh"
 
-	DefaultSystemName = "Armada"
+	DefaultSystemName = "SEELe"
 	maxSystemNameLen  = 128
 )
 

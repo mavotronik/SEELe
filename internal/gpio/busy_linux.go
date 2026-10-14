@@ -68,7 +68,7 @@ func enrichGPIOBusyError(chip string, offset, linuxGPIO int, err error) error {
 		}
 	}
 
-	parts = append(parts, "диагностика: apk add libgpiod && gpioinfo "+chip+"  (consumer уже в логе armada)")
+	parts = append(parts, "диагностика: apk add libgpiod && gpioinfo "+chip+"  (consumer уже в логе seele)")
 
 	if len(parts) == 0 {
 		return base

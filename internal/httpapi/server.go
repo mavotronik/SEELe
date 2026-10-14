@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"os"
 
-	"armada/internal/gpio"
-	"armada/internal/host"
-	"armada/internal/settings"
-	"armada/internal/term"
-	webroot "armada/web"
+	"seele/internal/gpio"
+	"seele/internal/host"
+	"seele/internal/settings"
+	"seele/internal/term"
+	webroot "seele/web"
 
 	"github.com/coder/websocket"
 )
@@ -28,7 +28,7 @@ func New(collector *host.Collector, gpioMgr *gpio.Manager, settingsStore *settin
 		collector: collector,
 		gpio:      gpioMgr,
 		settings:  settingsStore,
-		password:  os.Getenv("ARMADA_PASSWORD"),
+		password:  os.Getenv("SEELE_PASSWORD"),
 		mux:       http.NewServeMux(),
 	}
 	s.routes()
@@ -124,7 +124,7 @@ func (s *Server) basicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, pass, ok := r.BasicAuth()
 		if !ok || user != "admin" || pass != s.password {
-			w.Header().Set("WWW-Authenticate", `Basic realm="Armada"`)
+			w.Header().Set("WWW-Authenticate", `Basic realm="SEELe"`)
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}

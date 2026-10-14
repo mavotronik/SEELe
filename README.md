@@ -1,4 +1,4 @@
-# Armada
+# SEELe
 
 Агент управления узлом ARM-кластера. Pre-MVP: один Go-бинарник отдаёт веб-интерфейс, показывает метрики **этого** хоста и открывает интерактивную консоль в браузере.
 
@@ -11,7 +11,7 @@
 - **Настройки** — название системы, автообновление данных в UI
 - **Консоль** — shell узла (`/bin/sh`) через WebSocket и xterm.js
 - **API** — `GET /api/v1/host` (JSON-снимок для будущего контроллера кластера)
-- **Опциональная авторизация** — HTTP Basic (`admin` + пароль из `ARMADA_PASSWORD`)
+- **Опциональная авторизация** — HTTP Basic (`admin` + пароль из `SEELE_PASSWORD`)
 
 ## Требования
 
@@ -43,37 +43,37 @@ make up
 Пароль (если нужен):
 
 ```bash
-ARMADA_PASSWORD=secret make up
+SEELE_PASSWORD=secret make up
 ```
 
 ### Сборка для платы (ARMv7)
 
 ```bash
 make armv7
-# bin/armada-armv7
+# bin/seele-armv7
 ```
 
 Скопируйте бинарник на устройство и запустите, например:
 
 ```bash
-./armada-armv7 -listen :8080
+./seele-armv7 -listen :8080
 ```
 
 ### OpenRC (Alpine на плате)
 
-Пример unit: [`deploy/armada.openrc`](deploy/armada.openrc).
+Пример unit: [`deploy/seele.openrc`](deploy/seele.openrc).
 
 ## Конфигурация
 
 | Параметр / переменная | Описание |
 |----------------------|----------|
 | `-listen` | Адрес HTTP-сервера (по умолчанию `:8080`) |
-| `-db-path` | Каталог SQLite-баз (по умолчанию `/etc/armada`): `settings.db`, `gpio.db` |
+| `-db-path` | Каталог SQLite-баз (по умолчанию `/etc/seele`): `settings.db`, `gpio.db` |
 | `-no-gpio` | Заглушка GPIO (для Docker/x86) |
 | `-iomux-dev` | Устройство Rockchip pinmux (по умолчанию `/dev/iomux`; пустая строка — не трогать mux) |
-| `ARMADA_PASSWORD` | Если задан — Basic Auth на все маршруты, включая WebSocket |
+| `SEELE_PASSWORD` | Если задан — Basic Auth на все маршруты, включая WebSocket |
 
-`make run` использует `./data`; Docker Compose монтирует `./docker-data` в `/etc/armada` (каталог создаётся при `make up`).
+`make run` использует `./data`; Docker Compose монтирует `./docker-data` в `/etc/seele` (каталог создаётся при `make up`).
 
 Если `gpio.db` отсутствует или пуст, сохранённая конфигурация GPIO не применяется при старте.
 
@@ -82,12 +82,12 @@ make armv7
 На официальном Buildroot-образе Luckfox pinmux меняют через `luckfox-config`; в **Alpine его нет**. Варианты:
 
 1. **Проще всего** — использовать контакты **GPIO1** (например 12, 14, 15, 16): они обычно уже в режиме GPIO.
-2. **Без пересборки DTB** — на RV1106 armada сама переводит pad в GPIO: сначала `/dev/iomux`, если его нет — запись регистра IOMUX в IOC (`0xff538000`) через `/dev/mem`. Процесс должен быть **root**. Это не требует `luckfox-config` и не требует своего ядра у пользователя.
+2. **Без пересборки DTB** — на RV1106 seele сама переводит pad в GPIO: сначала `/dev/iomux`, если его нет — запись регистра IOMUX в IOC (`0xff538000`) через `/dev/mem`. Процесс должен быть **root**. Это не требует `luckfox-config` и не требует своего ядра у пользователя.
 3. Линии, которые ядро уже заняло (`gpioinfo` показывает `consumer=`, например **SPI0 CS0** на контакте 12), так не освободить: драйвер SPI держит GPIO. Для них либо другой контакт, либо `status = "disabled"` у `&spi0`.
 
 Контакты **1–2** заняты консолью UART2 и в UI не показываются. На контактах **UART3/UART4** в интерфейсе есть предупреждение.
 
-**`device or resource busy`** — линию уже держит драйвер ядра. В логе armada будет `consumer=…` (например **`spi0 CS0`** на **контакте 12** — нужно `status = "disabled"` у `&spi0` в device tree, если SPI не используете). Без `gpioinfo`: `apk add libgpiod` (репозиторий **community** в `/etc/apk/repositories`) или смотрите consumer в логе armada. «Свободные» контакты для GPIO: **11**, **17**, **29**, **34**.
+**`device or resource busy`** — линию уже держит драйвер ядра. В логе seele будет `consumer=…` (например **`spi0 CS0`** на **контакте 12** — нужно `status = "disabled"` у `&spi0` в device tree, если SPI не используете). Без `gpioinfo`: `apk add libgpiod` (репозиторий **community** в `/etc/apk/repositories`) или смотрите consumer в логе seele. «Свободные» контакты для GPIO: **11**, **17**, **29**, **34**.
 
 ## API
 
@@ -115,7 +115,7 @@ WebSocket консоли: `GET /ws/console` (бинарные кадры — в�
 ## Структура проекта
 
 ```
-cmd/armada/          точка входа
+cmd/seele/           точка входа
 internal/host/       сбор метрик из /proc и /sys
 internal/httpapi/    HTTP, статика, WebSocket
 internal/term/       PTY (Linux, без CGO)

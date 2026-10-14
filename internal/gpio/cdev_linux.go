@@ -145,12 +145,12 @@ func (b *CdevBackend) requestLocked(linuxGPIO int, mode Mode, outHigh bool) erro
 			gpiocdev.AsOutput(v),
 			gpiocdev.AsPushPull,
 			gpiocdev.AsActiveHigh,
-			gpiocdev.WithConsumer("armada"),
+			gpiocdev.WithConsumer("seele"),
 		)
 	default:
 		line, err = gpiocdev.RequestLine(chip, offset,
 			gpiocdev.AsInput,
-			gpiocdev.WithConsumer("armada"),
+			gpiocdev.WithConsumer("seele"),
 		)
 	}
 	if err != nil {

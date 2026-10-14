@@ -10,7 +10,7 @@ let cpuHistory = [];
 let charts = [];
 let consoleSession = null;
 let autoRefreshEnabled = true;
-let appSettings = { systemName: "Armada", autoRefresh: true };
+let appSettings = { systemName: "SEELe", autoRefresh: true };
 let modalConfirmHandler = null;
 
 function showToast(message) {
@@ -90,7 +90,7 @@ function closeModal() {
 }
 
 function applyAppSettings() {
-    const title = appSettings.systemName || "Armada";
+    const title = appSettings.systemName || "SEELe";
     document.getElementById("logoTitle").textContent = title;
     document.title = title;
 }
@@ -834,7 +834,7 @@ function applySettingsForm() {
     const nameInput = document.getElementById("settingsSystemName");
     const autoInput = document.getElementById("settingsAutoRefresh");
     if (!nameInput || !autoInput) return;
-    nameInput.value = appSettings.systemName || "Armada";
+    nameInput.value = appSettings.systemName || "SEELe";
     autoInput.checked = !!appSettings.autoRefresh;
 }
 

@@ -1,13 +1,13 @@
 #!/sbin/openrc-run
 
-name="armada"
-description="Armada node agent"
-command="/usr/local/bin/armada"
+name="seele"
+description="SEELe node agent"
+command="/usr/local/bin/seele"
 command_args="-listen :8080"
 command_background=true
 pidfile="/run/${RC_SVCNAME}.pid"
-output_log="/var/log/armada.log"
-error_log="/var/log/armada.log"
+output_log="/var/log/seele.log"
+error_log="/var/log/seele.log"
 
 depend() {
 	need net

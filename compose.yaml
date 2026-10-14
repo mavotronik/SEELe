@@ -1,10 +1,10 @@
 services:
-  armada:
+  seele:
     build: .
     ports:
       - "18080:8080"
     command: ["-listen", ":8080", "-no-gpio"]
     volumes:
-      - ./docker-data:/etc/armada
+      - ./docker-data:/etc/seele
     environment:
-      ARMADA_PASSWORD: ${ARMADA_PASSWORD:-}
+      SEELE_PASSWORD: ${SEELE_PASSWORD:-}

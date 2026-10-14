@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"armada/internal/gpio"
+	"seele/internal/gpio"
 )
 
 func (s *Server) handleGPIOList(w http.ResponseWriter, r *http.Request) {

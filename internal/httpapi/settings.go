@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"armada/internal/settings"
+	"seele/internal/settings"
 )
 
 func (s *Server) handleSettingsGet(w http.ResponseWriter, r *http.Request) {

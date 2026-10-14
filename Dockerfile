@@ -7,14 +7,14 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /armada ./cmd/armada
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /seele ./cmd/seele
 
 FROM alpine:3.20
 
 RUN apk add --no-cache ca-certificates
 
-COPY --from=build /armada /usr/local/bin/armada
+COPY --from=build /seele /usr/local/bin/seele
 
 EXPOSE 8080
-ENTRYPOINT ["/usr/local/bin/armada"]
+ENTRYPOINT ["/usr/local/bin/seele"]
 CMD ["-listen", ":8080", "-no-gpio"]

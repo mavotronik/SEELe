@@ -28,7 +28,7 @@ func (b *SysfsBackend) Export(linuxGPIO int) error {
 		if _, statErr := os.Stat(gpioPath); statErr == nil {
 			return nil
 		}
-		return fmt.Errorf("export GPIO %d: %w (pin may be busy in kernel/DT or sysfs export disabled — use a recent armada build with gpio-cdev)", linuxGPIO, err)
+		return fmt.Errorf("export GPIO %d: %w (pin may be busy in kernel/DT or sysfs export disabled — use a recent seele build with gpio-cdev)", linuxGPIO, err)
 	}
 	return nil
 }
